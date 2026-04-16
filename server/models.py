@@ -17,6 +17,10 @@ db = SQLAlchemy(metadata=metadata)
 bcrypt = Bcrypt()
 
 class User(db.Model, SerializerMixin):
+    """
+    Represents a user in the system. Handles password hashing and 
+    provides basic validation for usernames.
+    """
     __tablename__ = 'users'
 
     serialize_rules = ('-_password_hash', '-notes.user')
@@ -43,13 +47,19 @@ class User(db.Model, SerializerMixin):
     @validates('username')
     def validate_username(self, key, username):
         if not username:
-            raise ValueError('Username is required')
+            raise ValueError('Username can\'t be empty.')
+        if len(username) < 3:
+            raise ValueError('Username must be at least 3 characters long.')
         return username
 
     def __repr__(self):
         return f'<User {self.username}>'
 
 class Note(db.Model, SerializerMixin):
+    """
+    A personal note created by a user. Each note has a title and content, 
+    and is linked to a specific user.
+    """
     __tablename__ = 'notes'
 
     serialize_rules = ('-user.notes',)
@@ -68,7 +78,9 @@ class Note(db.Model, SerializerMixin):
     @validates('title')
     def validate_title(self, key, title):
         if not title:
-            raise ValueError('Title is required')
+            raise ValueError('Notes need a title!')
+        if len(title) > 100:
+            raise ValueError('Title is a bit too long (keep it under 100 chars).')
         return title
 
     def __repr__(self):

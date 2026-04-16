@@ -1,61 +1,54 @@
-# Notes API Backend
+# Personal Notes API
 
-This is a secure Flask API backend built for a productivity tool that allows users to track personal notes. It features session-based authentication and restricted access to ensure data privacy between users.
+This is the backend for a simple Notes application. I've built it using Flask and SQLAlchemy to help users keep track of their personal thoughts and tasks securely. It uses session-based authentication to make sure everyone's notes stay private.
 
-## Features
-- Full Authentication (Signup, Login, Logout, Check Session)
-- User-owned resource: **Notes**
-- CRUD operations for Notes
-- Pagination on Note index
-- Secure password hashing with Bcrypt
-- Session-based authorization
+## Key Features
+- **User Accounts**: Sign up and log in securely.
+- **Private Notes**: Your notes are yours only. Nobody else can see them.
+- **Pagination**: The notes list is paginated so it doesn't slow down if you have tons of notes.
+- **Secure Passwords**: I'm using Bcrypt for hashing, so passwords aren't stored in plain text.
 
-## Installation
+## Setup & Running
 
-1. Navigate to the `server` directory:
+1. **Get inside the server folder**:
    ```bash
    cd server
    ```
-2. Install dependencies using Pipenv:
+2. **Install what's needed**:
    ```bash
    pipenv install
    ```
-3. Initialize the database and run migrations:
+3. **Setup the database**:
    ```bash
-   export FLASK_APP=app.py
    pipenv run flask db init
-   pipenv run flask db migrate -m "Initial migration"
+   pipenv run flask db migrate -m "Initial setup"
    pipenv run flask db upgrade
    ```
-4. Seed the database with sample data:
+4. **Seed it with some data**:
    ```bash
    pipenv run python seed.py
    ```
+5. **Start the server**:
+   ```bash
+   pipenv run python app.py
+   ```
+   The API should be live at `http://localhost:5555`.
 
-## Running the Application
+## API Routes
 
-To start the Flask server:
-```bash
-pipenv run python app.py
-```
-The server will run on `http://localhost:5555`.
+### Auth Stuff
+- `POST /signup`: Register a new user.
+- `POST /login`: Log in to your account.
+- `DELETE /logout`: Log out.
+- `GET /check_session`: See if you're still logged in.
 
-## API Endpoints
-
-### Authentication
-- `POST /signup`: Create a new user account.
-- `POST /login`: Log in to an existing account.
-- `DELETE /logout`: Log out of the current account.
-- `GET /check_session`: Verify current login status and get user details.
-
-### Notes (Protected)
-- `GET /notes`: List all notes for the authenticated user (supports `page` and `per_page` query params).
+### The Notes (Need to be logged in)
+- `GET /notes`: List your notes. Supports `?page=1&per_page=5`.
 - `POST /notes`: Create a new note.
-- `PATCH /notes/<id>`: Update an existing note by ID.
-- `DELETE /notes/<id>`: Delete a note by ID.
+- `PATCH /notes/<id>`: Edit a note by its ID.
+- `DELETE /notes/<id>`: Get rid of a note.
 
-## Project Structure
-- `app.py`: Main application entry point and routes.
-- `models.py`: Database models (User, Note).
-- `seed.py`: Database seeding script.
-- `migrations/`: Database migrations managed by Flask-Migrate.
+## Challenges & Notes
+- Implementing the custom password setter in the `User` model took a bit of trial and error to get the hashing right.
+- Making sure the `Note` model correctly filtered by `user_id` in the API endpoints was key for security.
+- Pagination was added to the `/notes` GET route to improve performance for users with many records.
